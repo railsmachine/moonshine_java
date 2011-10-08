@@ -17,30 +17,30 @@ module Moonshine
     def java(options = {})
       java_package = (options[:package] || configuration[:java][:package])
 
-      java_alternative = case java_package
-                         when "sun-java6-bin" then "java-6-sun"
-                         else java_package
-                         end
+      file '/var/cache/preseeding',
+        :ensure => :directory,
+        :alias => 'preseeding directory'
+
+      file '/var/cache/preseeding/java.seed',
+        :ensure => :present,
+        :content => template(java_template_dir.join('java.seed'), binding)
 
       package java_package,
         :ensure  => :installed,
         :alias   => 'java',
-        :require => [ exec('noninteractive-dpkg'), exec('debconf-set-java-selections') ]
+        :responsefile => '/var/cache/preseeding/java.seed',
+        :require => file('/var/cache/preseeding/java.seed')
 
-      exec 'debconf-set-selections < /etc/java-debconf-set-selections',
-        :alias   => 'debconf-set-java-selections',
-        :require => file('/etc/java-debconf-set-selections')
-
-      exec 'dpkg-reconfigure debconf --frontend=noninteractive',
-        :alias => 'noninteractive-dpkg'
-
-      file '/etc/java-debconf-set-selections',
-        :content => template(java_template_dir.join('java-debconf-set-selections.erb'), binding),
-        :notify  => exec('debconf-set-java-selections')
-
-      exec "update-java-alternatives -s #{java_alternative} || true",
+      java_alternative = case java_package
+                         when "sun-java6-bin" then "java-6-sun"
+                         else java_package
+                           raise "Don't know how to handle alternative #{java_package}"
+                         end
+      
+      exec "update-java-alternatives --set #{java_alternative}",
         :require => package('java'),
-        :alias   => 'update-java-alternatives'
+        :alias   => 'update-java-alternatives',
+        :unless =>  "update-alternatives --display java | grep #{java_alternative}"
       
       recipe :canonical_source
     end
