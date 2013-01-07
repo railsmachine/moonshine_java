@@ -4,7 +4,7 @@ module Moonshine
     def self.included(manifest)
       manifest.class_eval do
         extend ClassMethods
-        configure :java => { :package => 'sun-java6-bin' }
+        configure :java => { :package => 'openjdk-6-jdk' }
       end
     end
 
@@ -33,14 +33,22 @@ module Moonshine
 
       java_alternative = case java_package
                          when "sun-java6-bin" then "java-6-sun"
+                         when "openjdk-6-jdk" then "java-1.6.0-openjdk"
                          else java_package
                            raise "Don't know how to handle alternative #{java_package}"
                          end
+
+      update_alternative_expected_display = case java_package
+                                            when "sun-java6-bin" then java_alternative
+                                            when "openjdk-6-jdk" then "java-6-openjdk"
+                                            else
+                                              raise "Don't know how to check alternative #{java_package}"
+                                            end
       
       exec "update-java-alternatives --set #{java_alternative}",
         :require => package('java'),
         :alias   => 'update-java-alternatives',
-        :unless =>  "update-alternatives --display java | grep #{java_alternative}"
+        :unless =>  "update-alternatives --display java | grep -e #{update_alternative_expected_display}"
       
       recipe :canonical_source
     end

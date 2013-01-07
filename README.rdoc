@@ -2,7 +2,7 @@
 
 === A plugin for Moonshine[http://github.com/railsmachine/moonshine]
 
-A plugin for installing and managing java. Currently installs the `sun-java6-bin` package by default.
+A plugin for installing and managing java. Currently installs the `openjdk-6-jdk` package by default.
 
 === Instructions
 
