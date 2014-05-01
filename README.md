@@ -1,10 +1,10 @@
-= Moonshine Java
+# Moonshine Java
 
-=== A plugin for Moonshine[http://github.com/railsmachine/moonshine]
+### A plugin for Moonshine[http://github.com/railsmachine/moonshine]
 
 A plugin for installing and managing java. Currently installs the `openjdk-6-jdk` package by default.
 
-=== Instructions
+### Instructions
 
 * <tt>script/plugin install git://github.com/railsmachine/moonshine_java.git</tt>
 * Configure settings if needed
@@ -12,3 +12,4 @@ A plugin for installing and managing java. Currently installs the `openjdk-6-jdk
 
 * Invoke the recipe(s) in your Moonshine manifest
     recipe :java
+    
